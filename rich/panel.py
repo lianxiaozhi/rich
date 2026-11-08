@@ -204,6 +204,7 @@ class Panel(JupyterMixin):
             return text
 
         title_text = self._title
+        subtitle_text = self._subtitle
         if title_text is not None:
             title_text.stylize_before(border_style)
 
@@ -221,6 +222,8 @@ class Panel(JupyterMixin):
             child_width = min(
                 options.max_width - 2, max(child_width, title_text.cell_len + 2)
             )
+        if subtitle_text is not None:
+            child_width = max(child_width, min(width - 2, subtitle_text.cell_len + 2))
 
         width = child_width + 2
         child_options = options.update(
@@ -252,7 +255,6 @@ class Panel(JupyterMixin):
             yield line_end
             yield new_line
 
-        subtitle_text = self._subtitle
         if subtitle_text is not None:
             subtitle_text.stylize_before(border_style)
 
@@ -278,6 +280,7 @@ class Panel(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
         _title = self._title
+        _subtitle = self._subtitle
         _, right, _, left = Padding.unpack(self.padding)
         padding = left + right
         renderables = [self.renderable, _title] if _title else [self.renderable]
@@ -292,6 +295,8 @@ class Panel(JupyterMixin):
                 + padding
                 + 2
             )
+            if _subtitle is not None:
+                width = max(width, min(options.max_width, _subtitle.cell_len + 4))
         else:
             width = self.width
         return Measurement(width, width)
